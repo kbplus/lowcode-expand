@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kbplus.dynamic.demo.mapper.DbInfoMapper">
+
+    <resultMap type="com.kbplus.dynamic.demo.entity.DbInfo" id="DbInfoMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="driverClassName" column="driver_class_name" jdbcType="VARCHAR"/>
+        <result property="expandJarName" column="expand_jar_name" jdbcType="VARCHAR"/>
+        <result property="tenantId" column="tenant_id" jdbcType="VARCHAR"/>
+        <result property="jarPath" column="jar_path" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--根据租户id查询单个-->
+    <select id="getByTenantId" resultMap="DbInfoMap">
+        select id, username, password, url, driver_class_name, expand_jar_name, tenant_id, jar_path
+        from db_info
+        where tenant_id = #{tenantId}
+    </select>
+
+    <!--查询数据是否存在根据租户id-->
+    <select id="queryTenantExist" resultType="INTEGER">
+        select count(1)
+        from db_info
+        where tenant_id = #{tenantId}
+    </select>
+
+    <select id="queryById" resultMap="DbInfoMap">
+        select id, username, password, url, driver_class_name, expand_jar_name, tenant_id, jar_path
+        from db_info
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="DbInfoMap">
+        select
+          id, username, password, url, driver_class_name, expand_jar_name, tenant_id, jar_path
+        from db_info
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="url != null and url != ''">
+                and url = #{url}
+            </if>
+            <if test="driverClassName != null and driverClassName != ''">
+                and driver_class_name = #{driverClassName}
+            </if>
+            <if test="expandJarName != null and expandJarName != ''">
+                and expand_jar_name = #{expandJarName}
+            </if>
+            <if test="tenantId != null and tenantId != ''">
+                and tenant_id = #{tenantId}
+            </if>
+            <if test="jarPath != null and jarPath != ''">
+                and jar_path = #{jarPath}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from db_info
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="url != null and url != ''">
+                and url = #{url}
+            </if>
+            <if test="driverClassName != null and driverClassName != ''">
+                and driver_class_name = #{driverClassName}
+            </if>
+            <if test="expandJarName != null and expandJarName != ''">
+                and expand_jar_name = #{expandJarName}
+            </if>
+            <if test="tenantId != null and tenantId != ''">
+                and tenant_id = #{tenantId}
+            </if>
+            <if test="jarPath != null and jarPath != ''">
+                and jar_path = #{jarPath}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into db_info(username, password, url, driver_class_name, expand_jar_name, tenant_id, jar_path)
+        values (#{username}, #{password}, #{url}, #{driverClassName}, #{expandJarName}, #{tenantId}, #{jarPath})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_info(username, password, url, driver_class_name, expand_jar_name, tenant_id, jar_path)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.username}, #{entity.password}, #{entity.url}, #{entity.driverClassName}, #{entity.expandJarName}, #{entity.tenantId}, #{entity.jarPath})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into db_info(username, password, url, driver_class_name, expand_jar_name, tenant_id, jar_path)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.username}, #{entity.password}, #{entity.url}, #{entity.driverClassName}, #{entity.expandJarName}, #{entity.tenantId}, #{entity.jarPath})
+        </foreach>
+        on duplicate key update
+        username = values(username),
+        password = values(password),
+        url = values(url),
+        driver_class_name = values(driver_class_name),
+        expand_jar_name = values(expand_jar_name),
+        tenant_id = values(tenant_id),
+        jar_path = values(jar_path)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update db_info
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="url != null and url != ''">
+                url = #{url},
+            </if>
+            <if test="driverClassName != null and driverClassName != ''">
+                driver_class_name = #{driverClassName},
+            </if>
+            <if test="expandJarName != null and expandJarName != ''">
+                expand_jar_name = #{expandJarName},
+            </if>
+            <if test="tenantId != null and tenantId != ''">
+                tenant_id = #{tenantId},
+            </if>
+            <if test="jarPath != null and jarPath != ''">
+                jar_path = #{jarPath},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from db_info where id = #{id}
+    </delete>
+
+</mapper>
+
